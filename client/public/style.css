@@ -1,0 +1,294 @@
+/* General Reset */
+* {
+    margin: 5;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: Arial, sans-serif;
+}
+.logo {
+    display: flex;
+    align-items: center; /* Align items vertically */
+    gap: 10px; /* Add space between the logo and the text */
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #fff; /* Ensure the text matches the theme of the header */
+}
+
+.logo-image {
+    width: 40px; /* Adjust the size of the logo image */
+    height: 40px;
+    object-fit: contain; /* Maintain the aspect ratio of the logo */
+    border-radius: 50%; /* Optional: makes the logo circular */
+}
+
+/* Navigation Bar */
+header {
+    background-color: #333;
+    color: #fff;
+    padding: 1rem 2rem;
+    display: flex;
+    align-items: center;
+}
+
+.logo {
+    font-size: 1.5rem;
+    font-weight: bold;
+}
+
+/* Aligns main navigation and right buttons to each side */
+.nav-container {
+    display: flex;
+    width: 100%;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.nav-container nav ul {
+    list-style: none;
+    display: flex;
+    gap: 1rem;
+    margin-left: 2rem; /* Adjusted to push nav items closer to the center */
+}
+
+.nav-container nav ul li a {
+    color: #fff;
+    text-decoration: none;
+}
+
+.right-buttons {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.search-bar {
+    padding: 0.5rem;
+    border-radius: 4px;
+    border: 1px solid #ccc;
+    background-color: #f8edd9;
+    flood-color: #fff;
+}
+
+.signin-button {
+    background-color: #f7b733;
+    color: #fff;
+    padding: 0.5rem 1rem;
+    border-radius: 4px;
+    text-decoration: none;
+}
+/* Button for Login */
+.login-button {
+    padding: 0.5rem 1rem;
+    background-color: #f7b733; /* Yellow color */
+    color: white;
+    text-decoration: none;
+    border-radius: 5px;
+    margin-left: 1rem;
+    transition: background-color 0.3s;
+}
+
+.login-button:hover {
+    background-color: #f4a026; /* Slightly darker yellow on hover */
+}
+
+
+
+/* Main Banner Section */
+.banner {
+    position: relative;
+    height: 400px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    text-align: center;
+}
+
+.banner-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden; /* Ensures the image doesn't extend outside the section */
+    background-color: rgba(0, 0, 0, 0.4); /* Additional dark overlay */
+    z-index: 0;
+}
+
+.banner-background {
+    width: 100%;
+    height: 100%;
+    object-fit: cover; /* Ensures the image covers the entire area without stretching */
+    opacity: 0.7; /* Adjust this value for the desired opacity */
+}
+
+.banner-text {
+    position: relative;
+    z-index: 1; /* Positions text above the background */
+    padding-top: 1.5rem;
+}
+
+.banner-text h2 {
+    font-size: 3.5rem;
+    margin-bottom: 0.5rem;
+    font-family: "Nunito", sans-serif;
+    font-optical-sizing: auto;
+    font-weight: 700;
+    opacity: 2.5;
+    font-style: normal;
+    color: #fff; /* Ensures the text stands out */
+    text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.6), 
+                 4px 4px 10px rgba(0, 0, 0, 0.4);
+}
+
+
+.banner-text p {
+    font-size: 1.4rem;
+    margin-bottom: 1.5rem;
+    font-family: "Sour Gummy", sans-serif;
+  font-optical-sizing: auto;
+  font-weight: 450;
+  font-style:normal;
+  color:#f7b733;
+}
+
+/* Adjusted CTA button styling */
+.cta-button {
+    background-color: #f7b733;
+    color: #fff;
+    padding: 0.8rem 1.5rem;
+    border-radius: 5px;
+    text-decoration: none;
+    margin-top: 1.5rem;
+    opacity: 0.9; /* Slight opacity on button */
+}
+
+/* About Section */
+.about {
+    display: flex;
+    padding: 2rem;
+    background-color: #f4f4f4;
+}
+.highlight1{
+margin-top: 2px;
+}
+
+.about-text, .about-image {
+    flex: 1;
+    padding: 1rem;
+}
+
+.about-image img {
+    width: 100%;
+    border-radius: 8px;
+}
+
+/* Features Section */
+.features {
+    padding: 2rem;
+    text-align: center;
+    background-color: #fff;
+}
+
+.features h2 {
+    font-size: 1.8rem;
+    margin-bottom: 1.5rem;
+}
+
+.feature-list {
+    display: flex;
+    justify-content: space-around;
+    gap: 1rem;
+}
+
+.feature-item {
+    text-align: center;
+    flex: 1;
+    padding: 1rem;
+}
+
+.feature-item img {
+    width: 100%;      /* Ensure the image takes up full width of the container */
+    height: 250px;    /* Set a fixed height for all images */
+    object-fit: cover; /* Ensures the image covers the space without distortion */
+    border-radius: 8px;
+    margin-bottom: 1rem;
+}
+
+.feature-item h3 {
+    font-size: 1.3rem;
+    margin-bottom: 0.5rem;
+}
+
+/* Footer Section */
+footer {
+    background-color: #333;
+    color: #fff;
+    padding: 2rem;
+    text-align: center;
+}
+
+.footer-content {
+    display: flex;
+    justify-content: space-around;
+    flex-wrap: wrap;
+}
+
+.footer-section {
+    flex: 1;
+    margin: 0.5rem;
+}
+
+.footer-section h3 {
+    margin-bottom: 0.5rem;
+}
+
+.footer-section p, .footer-section a {
+    color: #ccc;
+    text-decoration: none;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .nav-container nav ul {
+        margin-left: 0; /* Center nav items on smaller screens */
+    }
+    
+    .feature-list {
+        flex-direction: column;
+    }
+}
+
+@media (max-width: 480px) {
+    .banner-text h2 {
+        font-size: 2rem;
+    }
+
+    .features h2 {
+        font-size: 1.5rem;
+    }
+}
+/* Fixed Button for "Sell Your Car" */
+.sell-fixed-button {
+    position: fixed;
+    bottom: 20px; /* Adjust the distance from the bottom */
+    right: 20px;  /* Adjust the distance from the right */
+    background-color: #f7b733; /* Button background color */
+    color: white; /* Text color */
+    padding: 0.8rem 1.5rem; /* Padding for the button */
+    font-size: 1rem; /* Font size */
+    font-weight: bold; /* Bold text */
+    text-decoration: none; /* Remove underline */
+    border-radius: 50px; /* Rounded corners for chat-like appearance */
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Add a subtle shadow */
+    transition: all 0.3s ease; /* Smooth hover effect */
+    z-index: 1000; /* Ensure it's always on top */
+  }
+  
+  .sell-fixed-button:hover {
+    background-color: #f4a026; /* Slightly darker shade on hover */
+    transform: scale(1.05); /* Slight zoom effect */
+  }

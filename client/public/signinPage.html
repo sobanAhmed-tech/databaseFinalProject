@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create Account - AutoBid</title>
+    <link rel="stylesheet" href="signup.css">
+    <style>
+        /* New CSS provided */
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-image: url('images/sign-in.webp'); /* Assuming the image path */
+            background-size: cover;
+            background-position: center;
+            
+        }
+        .signup-container {
+    background-color: #fff;
+    padding: 15px 25px; /* Reduced padding to make the container smaller */
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    text-align: center;
+    width: 350px;
+    /* Optional: Set a fixed height if you want to limit the height more */
+    min-height: 400px; /* You can adjust this value if needed */
+}
+
+        h2 {
+            color: #333;
+            margin-bottom: 20px;
+        }
+
+        p {
+            color: #666;
+            margin-bottom: 20px;
+        }
+
+        input[type="text"], 
+        input[type="password"], 
+        input[type="email"], 
+        input[type="tel"] {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        button {
+            width: 100%;
+            padding: 10px;
+            background-color: #f7b733;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #e5a425;
+        }
+
+        .cancelbtn {
+            background-color: #f44336;
+            margin-top: 10px;
+        }
+
+        .login-link {
+            margin-top: 15px;
+            display: block;
+            font-size: 14px;
+            color: #555;
+        }
+
+        .login-link a {
+            color: #f7b733;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        .login-link a:hover {
+            text-decoration: underline;
+        }
+
+        small {
+            display: block;
+            margin-top: 15px;
+            color: #666;
+        }
+
+        /* Responsive design */
+        @media (max-width: 400px) {
+            .signup-container {
+                padding: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="signup-container">
+        <h2>Create Your AutoBid Account</h2>
+        <p>Sign up quickly and easily.</p>
+        
+        <form id="signupForm">
+            <!-- New fields for first name, last name, and phone number -->
+            <input type="text" id="first_name" name="first_name" placeholder="First Name" required>
+            <input type="text" id="last_name" name="last_name" placeholder="Last Name" required>
+            <input type="tel" id="contact_number" name="contact_number" placeholder="Phone Number" required>
+            <input type="email" id="email" name="email" placeholder="Enter your email" required>
+            <input type="password" id="password" name="password" placeholder="Enter your password" required>
+            <input type="password" id="password-repeat" name="password-repeat" placeholder="Repeat your password" required>
+            
+            <button type="submit">Sign Up</button>
+            <button type="button" class="cancelbtn">Cancel</button>
+
+            <small>By signing up, you agree to our <a href="#">Terms & Privacy</a>.</small>
+        </form>
+
+        <div class="login-link">
+            Already have an account? <a href="signin.html">Login here</a>
+        </div>
+    </div>
+
+
+    
+    <script>
+        // Handle sign-up form submission
+        document.getElementById("signupForm").addEventListener("submit", async function (e) {
+            e.preventDefault(); // Prevent form from submitting normally
+
+            const firstName = document.getElementById("first_name").value;
+            const lastName = document.getElementById("last_name").value;
+            const contactNumber = document.getElementById("contact_number").value;
+            const email = document.getElementById("email").value;
+            const password = document.getElementById("password").value;
+            const passwordRepeat = document.getElementById("password-repeat").value;
+
+            if (password !== passwordRepeat) {
+                alert("Passwords do not match. Please try again.");
+                return;
+            }
+
+            try {
+                const response = await fetch("http://localhost:8000/registerUser", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify({
+                        first_name: firstName,
+                        last_name: lastName,
+                        contact_number: contactNumber,
+                        email: email,
+                        password: password
+                    }),
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    alert(data.message); // Show success message
+                } else {
+                    alert(data.error); // Show error message
+                }
+            } catch (error) {
+                console.error("Error during sign-up:", error);
+                alert("An error occurred. Please try again.");
+            }
+        });
+    </script>
+
+</body>
+</html>
