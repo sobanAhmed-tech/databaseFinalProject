@@ -5,13 +5,13 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Update Car Details</title>
   <link rel="stylesheet" href="upload-car.css">
-  <link rel="icon" href="images/MSU-logo/default.png" />
+  <link rel="icon" href="images/MSU-logo/default.png">
 </head>
 <body>
   <!-- Navbar -->
   <header class="navbar">
     <div class="container">
-      <a href="index.html"><img src="../images/MSU-logo/cover.png" alt="Company Logo" class="logo"></a>
+      <a href="index.html"><img src="images/MSU-logo/cover.png" alt="Company Logo" class="logo"></a>
       <h1 class="company-name">Update Your Car Details</h1>
       <nav>
         <a href="index.html" class="nav-button">Home</a>
@@ -28,11 +28,11 @@
       <h3>Edit Car Information</h3>
     </div>
     <div class="step">
-      <img src="../images/upload icon.svg" alt="Step 2 Icon">
+      <img src="images/upload-icon.svg" alt="Step 2 Icon">
       <h3>Update Photos</h3>
     </div>
     <div class="step">
-      <img src="../images/price-tag.svg" alt="Step 3 Icon">
+      <img src="images/price-tag.svg" alt="Step 3 Icon">
       <h3>Save Changes</h3>
     </div>
   </div>
@@ -40,25 +40,35 @@
   <!-- Form Section -->
   <main>
     <form id="updateCarForm">
+      <!-- Hidden Field for User ID -->
+      <input type="hidden" id="user-id" name="user_id" value="1" required> <!-- Default user_id for testing -->
+    
       <label for="car-name">Car Name:</label>
-      <input type="text" id="car-name" name="car_name" required>
-      
-      <label for="car-model">Car Model:</label>
-      <input type="text" id="car-model" name="car_model" required>
-      
-        
+      <input type="text" id="car-name" name="vehicle_name" required>
+    
+      <label for="car-company">Car Company:</label>
+      <input type="text" id="car-company" name="vehicle_company" required>
+    
       <label for="variant">Variant:</label>
-      <input type="text" id="variant" name="variant">
-      
-      
-      <label for="city">City:</label>
-      <input type="text" id="city" name="city">
-      
+      <input type="text" id="variant" name="vehicle_type">
+    
+      <label for="vin-number">Chassis Number (VIN):</label>
+      <input type="text" id="vin-number" name="vin_number" required>
+    
+      <label for="car-model">Car Model:</label>
+      <input type="number" id="car-model" name="vehicle_model" required>
+    
+      <label for="manufacturing-year">Manufacturing Year:</label>
+      <input type="number" id="manufacturing-year" name="manufacturing_year" required>
+    
       <label for="mileage">Mileage (in km):</label>
-      <input type="number" id="mileage" name="mileage" required>
-      
+      <input type="number" id="mileage" name="vehicle_mileage">
+    
+      <label for="horse-power">Horse Power:</label>
+      <input type="number" id="horse-power" name="horse_power">
+    
       <label for="doors">Number of Doors:</label>
-      <select id="doors" name="doors" required>
+      <select id="doors" name="num_doors">
         <option value="" disabled selected>Select number of doors</option>
         <option value="2">2</option>
         <option value="3">3</option>
@@ -66,37 +76,27 @@
         <option value="5">5</option>
         <option value="6">6</option>
       </select>
-      
-      <label for="condition">Condition (Used/New):</label>
-      <select id="condition" name="condition" required>
-        <option value="" disabled selected>Select condition</option>
-        <option value="used">Used</option>
-        <option value="new">New</option>
+    
+      <label for="seats">Number of Seats:</label>
+      <input type="number" id="seats" name="seats">
+    
+      <label for="transmission">Transmission:</label>
+      <select id="transmission" name="transmission">
+        <option value="" disabled selected>Select transmission type</option>
+        <option value="automatic">Automatic</option>
+        <option value="manual">Manual</option>
       </select>
-      
-      <label for="chassis-number">Chassis Number:</label>
-      <input type="text" id="chassis-number" name="chassis_number" required>
-      
-      <label for="color">Color:</label>
-      <input type="text" id="color" name="color" required>
-      
-      <!-- Contact Info -->
-      <label for="seller-name">Seller Name:</label>
-      <input type="text" id="seller-name" name="seller_name" required>
-      
-      <label for="mobile-number">Mobile Number:</label>
-      <input type="text" id="mobile-number" name="mobile_number" placeholder="03XXXXXXXXX" required pattern="03\d{9}">
-      <small class="help-text">Enter a valid 11-digit number starting with 03.</small>
-      
+    
       <!-- Submit Button -->
       <button type="submit" class="submit-button">Update Car Details</button>
-    </form>
+    </form>    
   </main>
 
   <script>
     document.getElementById("updateCarForm").addEventListener("submit", async function (event) {
       event.preventDefault();
 
+      // Prepare form data as JSON
       const formData = new FormData(this);
       const jsonObject = {};
       formData.forEach((value, key) => {
@@ -104,6 +104,7 @@
       });
 
       try {
+        // Send POST request to the server
         const response = await fetch("http://localhost:8000/add-car", {
           method: "POST",
           headers: {
@@ -114,8 +115,11 @@
 
         const data = await response.json();
         if (!response.ok) throw new Error(data.error || "An error occurred");
-        alert(data.message || "Car added successfully!");
+        
+        // Show success alert
+        alert(data.message || "Car details updated successfully!");
       } catch (error) {
+        // Show error alert
         alert(`Error: ${error.message}`);
         console.error(error);
       }
@@ -123,3 +127,4 @@
   </script>
 </body>
 </html>
+

@@ -1,3 +1,5 @@
+server.js
+
 const express = require("express");
 const cors = require("cors");
 const path = require("path");
@@ -81,14 +83,10 @@ app.post("/authenticate", async (req, res) => {
   }
 });
 
-app.get("/upload-car", (req, res) => {
-  res.sendFile(path.join(__dirname, "../client/public/upload-car.html"));
-});
-
-// Endpoint to add a new vehicle
+// Add a New Car
 app.post("/add-car", (req, res) => {
   const {
-    user_id, // Foreign key reference to Users table
+    user_id,
     vehicle_name,
     vehicle_company,
     vehicle_type,
@@ -100,25 +98,22 @@ app.post("/add-car", (req, res) => {
     num_doors,
     seats,
     transmission,
-    vehicle_images, // Optional, can handle multiple paths for images
   } = req.body;
 
   // Validate required fields
-  if (!vehicle_name || !vin_number || !vehicle_model || !manufacturing_year ) {
+  if (!user_id || !vehicle_name || !vin_number || !vehicle_model || !manufacturing_year) {
     return res.status(400).json({ error: "Missing required fields." });
   }
 
-  // SQL query for inserting a new vehicle
   const query = `
-    INSERT INTO Vehicless 
-    (Seller_Id, Vehicle_Name,Vehicle_Variant, Vehicle_Company, Vehicle_Type, VIN_Number, Vehicle_Model, 
-     Manufacturing_Year, Horse_Power, Vehicle_Mileage, NumDoors, Seats, Transmission, 
-     Vehicle_Images)
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    INSERT INTO Vehicles 
+    (User_Id, Vehicle_Name, Vehicle_Company, Vehicle_Type, VIN_Number, Vehicle_Model, 
+     Manufacturing_Year, Horse_Power, Vehicle_Mileage, NumDoors, Seats, Transmission)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
   `;
 
   const values = [
-    user_id,  // Seller_Id is required for referencing the Users table
+    user_id,
     vehicle_name,
     vehicle_company || null,
     vehicle_type || null,
@@ -130,10 +125,8 @@ app.post("/add-car", (req, res) => {
     num_doors || null,
     seats || null,
     transmission || null,
-    vehicle_images || null,  // Optional column for vehicle images (can be null)
   ];
 
-  // Execute query
   db.query(query, values, (err, result) => {
     if (err) {
       console.error("Database error:", err);
@@ -144,10 +137,43 @@ app.post("/add-car", (req, res) => {
   });
 });
 
+// Fetch all cars to dynamically update the webpage
+app.get("/api/vehicles", (req, res) => {
+  const query = "SELECT * FROM Vehicles";
+
+  db.query(query, (err, results) => {
+    if (err) {
+      console.error("Error fetching vehicles:", err);
+      return res.status(500).json({ error: "Failed to fetch vehicles." });
+    }
+
+    res.status(200).json(results);
+  });
+});
+
 // Set up the server to listen
 const PORT = process.env.PORT || 8000;
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}.`);
 });
 
-// I added some changes here ebejkhf;jkerbjnebrnmbejrhuierbn 
+// API endpoint to fetch a specific vehicle by ID
+app.get('/api/vehicles/:vehicleId', (req, res) => {
+  const vehicleId = req.params.vehicleId;
+
+  // Query to fetch vehicle details by ID
+  const query = "SELECT * FROM Vehicles WHERE Vehicle_Id = ?";
+  
+  db.query(query, [vehicleId], (err, result) => {
+    if (err) {
+      console.error("Error fetching vehicle details:", err);
+      return res.status(500).json({ error: "Failed to fetch car details." });
+    }
+
+    if (result.length === 0) {
+      return res.status(404).json({ error: "Vehicle not found." });
+    }
+
+    res.status(200).json(result[0]); // Send the first result as the vehicle details
+  });
+});

@@ -1,0 +1,164 @@
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Car Details</title>
+    <link rel="stylesheet" href="vehicleDetails.css">
+    <link rel="icon" href="../images/MSU-logo/default.png" />
+</head>
+
+<body>
+    <!-- Navbar -->
+    <header class="navbar">
+        <div class="container navbar-content">
+            <!-- MSU Logo -->
+            <div class="navbar-logo">
+                <a href="index.html"><img src="../images/MSU-logo/cover.png" alt="Company Logo" class="logo"></a>
+            </div>
+
+            <!-- Navbar Title -->
+            <div class="navbar-title">
+                <h1>Car Details</h1>
+            </div>
+
+            <!-- Login and Signup Buttons -->
+            <div class="navbar-buttons">
+                <button class="nav-btn login">Login</button>
+                <button class="nav-btn signup">Sign Up</button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="details-container">
+        <!-- Car Images -->
+        <section class="car-image-gallery">
+            <div class="main-image">
+                <img src="" alt="Car Image" id="mainImage">
+            </div>
+        </section>
+
+        <section class="car-overview">
+            <div class="overview-item">
+                <img class="logo-1" src="../images/date_range_30dp_666666_FILL1_wght400_GRAD0_opsz24.svg" alt="Model Year Icon">
+                <p id="modelYear">2020</p>
+            </div>
+            <div class="overview-item">
+                <img src="../images/speed_30dp_666666_FILL1_wght400_GRAD0_opsz24.svg" alt="Mileage Icon">
+                <p id="mileage">88,500 km</p>
+            </div>
+            <div class="overview-item">
+                <img src="../images/local_gas_station_30dp_666666_FILL1_wght400_GRAD0_opsz24.svg" alt="Fuel Icon">
+                <p id="fuelType">Petrol</p>
+            </div>
+            <div class="overview-item">
+                <img src="../images/auto_transmission_30dp_666666_FILL1_wght400_GRAD0_opsz24.svg" alt="Transmission Icon">
+                <p id="transmission">Automatic</p>
+            </div>
+        </section>
+
+        <!-- Car Details -->
+        <section class="car-details">
+            <h2 id="vehicleName">Kia Sportage</h2>
+            <p><strong>Company:</strong> <span id="company">Kia</span></p>
+            <p><strong>Type:</strong> <span id="vehicleType">SUV</span></p>
+            <p><strong>VIN Number:</strong> <span id="vinNumber">12345678</span></p>
+            <p><strong>Model:</strong> <span id="vehicleModel">2020</span></p>
+            <p><strong>Manufacturing Year:</strong> <span id="manufacturingYear">2020</span></p>
+            <p><strong>Horse Power:</strong> <span id="horsePower">150 HP</span></p>
+            <p><strong>Mileage:</strong> <span id="vehicleMileage">88,500 km</span></p>
+            <p><strong>Number of Doors:</strong> <span id="numDoors">4</span></p>
+            <p><strong>Seats:</strong> <span id="seats">5</span></p>
+            <p><strong>Transmission:</strong> <span id="transmissionType">Automatic</span></p>
+        </section>
+
+        <!-- Features -->
+        <section class="car-features">
+            <h2>Features</h2>
+            <ul id="carFeatures">
+                <!-- List of features will be dynamically filled -->
+            </ul>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="custom-footer">
+        <div class="footer-content">
+            <!-- Car and Price Details -->
+            <div class="footer-left">
+                <h2 id="footerCarName">KIA Sportage AWD 2020</h2>
+                <p id="footerPrice">PKR 6,325,000</p>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="footer-center">
+                <button class="footer-btn phone-btn">
+                    <i class="fa fa-phone"></i> Contact Seller
+                </button>
+            </div>
+
+            <!-- Seller Information -->
+            <div class="footer-right">
+                <div class="seller-info">
+                    <p><strong>Seller Name:</strong> <span id="sellerName">John Doe</span></p>
+                    <p><strong>Contact:</strong> <span id="sellerContact">03123456789</span></p>
+                    <p><strong>City:</strong> <span id="sellerCity">Lahore</span></p>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Function to fetch car details based on vehicleId
+        async function fetchCarDetails() {
+            const params = new URLSearchParams(window.location.search);
+            const vehicleId = params.get("vehicleId");
+
+            if (!vehicleId) {
+                alert("Vehicle ID is missing!");
+                return;
+            }
+
+            try {
+                const response = await fetch(`http://localhost:8000/api/vehicles/${vehicleId}`);
+                if (!response.ok) {
+                    throw new Error("Failed to fetch car details");
+                }
+                const car = await response.json();
+
+                // Update the page with the fetched car data
+                document.getElementById("vehicleName").textContent = car.Vehicle_Name;
+                document.getElementById("company").textContent = car.Vehicle_Company;
+                document.getElementById("vehicleType").textContent = car.Vehicle_Type;
+                document.getElementById("vinNumber").textContent = car.VIN_Number;
+                document.getElementById("vehicleModel").textContent = car.Vehicle_Model;
+                document.getElementById("manufacturingYear").textContent = car.Manufacturing_Year;
+                document.getElementById("horsePower").textContent = car.Horse_Power;
+                document.getElementById("vehicleMileage").textContent = car.Vehicle_Mileage;
+                document.getElementById("numDoors").textContent = car.NumDoors;
+                document.getElementById("seats").textContent = car.Seats;
+                document.getElementById("transmissionType").textContent = car.Transmission;
+
+                // Footer details (optional)
+                document.getElementById("footerCarName").textContent = car.Vehicle_Name + " " + car.Vehicle_Model;
+
+                // Set car image (assuming the image URL is part of the car data)
+                document.getElementById("mainImage").src = car.Vehicle_Images || "../images/default_car_image.png";
+
+            } catch (error) {
+                console.error(error.message);
+                alert("An error occurred while fetching car details!");
+            }
+        }
+
+        // Fetch car details on page load
+        document.addEventListener("DOMContentLoaded", fetchCarDetails);
+    </script>
+</body>
+
+</html>
+
+
