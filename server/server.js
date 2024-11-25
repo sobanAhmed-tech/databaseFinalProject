@@ -14,6 +14,7 @@ app.use(cors());
 app.use(express.static(path.join(__dirname, "../client/public")));
 
 // Configure session middleware
+// hellioejkrhfjkerhfjkenrjk
 app.use(
   session({
     secret: "your_secret_key",
