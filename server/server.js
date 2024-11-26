@@ -27,6 +27,7 @@ app.use(
   })
 );
 
+
 // Global middleware to redirect unauthenticated users
 app.use((req, res, next) => {
   const publicRoutes = ["/signin", "/registerUser", "/authenticate"];
@@ -44,6 +45,7 @@ app.use((req, res, next) => {
   // Redirect to login page if not authenticated
   return res.redirect("/signin");
 });
+
 
 // Routes
 app.get("/signin", (req, res) => {
@@ -107,7 +109,7 @@ app.post("/authenticate", async (req, res) => {
     res.status(500).json({ error: "An error occurred during authentication" });
   }
 });
-
+/*
 app.post("/add-car", (req, res) => {
   const user_id = req.session.user_id;
 
@@ -151,13 +153,97 @@ app.post("/add-car", (req, res) => {
     transmission || null,
   ];
 
+
   db.query(query, values, (err, result) => {
     if (err) {
       console.error("Database error:", err);
       return res.status(500).json({ error: err.sqlMessage || "Failed to add vehicle." });
     }
 
+    
     res.status(201).json({ message: "Vehicle added successfully!", vehicleId: result.insertId });
+  });
+});
+
+*/
+
+app.post("/add-car", (req, res) => {
+  const user_id = req.session.user_id;
+
+  const {
+    vehicle_name,
+    vehicle_company,
+    vehicle_type,
+    vin_number,
+    vehicle_model,
+    manufacturing_year,
+    horse_power,
+    vehicle_mileage,
+    num_doors,
+    seats,
+    transmission,
+  } = req.body;
+
+  if (!vehicle_name || !vin_number || !vehicle_model || !manufacturing_year) {
+    return res.status(400).json({ error: "Missing required fields." });
+  }
+
+  // Calculate start and end times for the auction
+  const startTime = new Date(); // Current time
+  const endTime = new Date(startTime.getTime() + 2 * 60 * 1000); // Add 2 minutes
+
+  // Insert into the Vehicles table
+  const vehicleQuery = `
+    INSERT INTO Vehicles 
+    (User_Id, Vehicle_Name, Vehicle_Company, Vehicle_Type, VIN_Number, Vehicle_Model, 
+     Manufacturing_Year, Horse_Power, Vehicle_Mileage, NumDoors, Seats, Transmission)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+  `;
+
+  const vehicleValues = [
+    user_id,
+    vehicle_name,
+    vehicle_company || null,
+    vehicle_type || null,
+    vin_number,
+    vehicle_model,
+    manufacturing_year,
+    horse_power || null,
+    vehicle_mileage || null,
+    num_doors || null,
+    seats || null,
+    transmission || null,
+  ];
+
+  db.query(vehicleQuery, vehicleValues, (err, vehicleResult) => {
+    if (err) {
+      console.error("Database error (Vehicles):", err);
+      return res.status(500).json({ error: "Failed to add vehicle." });
+    }
+
+    const vehicleId = vehicleResult.insertId; // Get the inserted Vehicle_Id
+
+    // Insert into the Auctions table
+    const auctionQuery = `
+      INSERT INTO Auctions (User_Id, Vehicle_Id, Starting_Time, Ending_Time, Auction_Status)
+      VALUES (?, ?, ?, ?, 'open')
+    `;
+
+    const auctionValues = [user_id, vehicleId, startTime, endTime];
+
+    db.query(auctionQuery, auctionValues, (err, auctionResult) => {
+      if (err) {
+        console.error("Database error (Auctions):", err);
+        return res.status(500).json({ error: "Failed to create auction." });
+      }
+
+      res.status(201).json({
+        message: "Vehicle and auction added successfully!",
+        vehicleId: vehicleId,
+        auctionId: auctionResult.insertId,
+        timer: { start: startTime, end: endTime },
+      });
+    });
   });
 });
 
@@ -213,8 +299,12 @@ app.post("/logout", (req, res) => {
   });
 });
 
+
+
 const PORT = process.env.PORT || 8000;
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}.`);
   console.log('server is running');
 });
+
+

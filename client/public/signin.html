@@ -39,24 +39,25 @@
         // Handle form submission using JavaScript
         document.getElementById("signinForm").addEventListener("submit", async function (e) {
             e.preventDefault(); // Prevent the form from submitting normally
-
+    
             const email = document.getElementById("email").value; // Use 'email' instead of 'username'
             const password = document.getElementById("password").value;
-
+    
             try {
                 const response = await fetch("http://localhost:8000/authenticate", {
                     method: "POST",
                     headers: {
                         "Content-Type": "application/json",
                     },
-                    body: JSON.stringify({ email, password }),  // Send email
+                    body: JSON.stringify({ email, password }), // Send email
                 });
-
+    
                 const data = await response.json();
-
+    
                 if (response.ok) {
                     alert(data.message); // Show success message
-                    // Redirect to a protected page or another action
+                    // Redirect to the main page (e.g., index.html)
+                    window.location.href = "/index.html";
                 } else {
                     alert(data.error); // Show error message
                 }
@@ -66,7 +67,7 @@
             }
         });
     </script>
-
+    
 </body>
 </html>
 

@@ -7,11 +7,33 @@
     <link rel="stylesheet" href="style.css" />
     <link rel="icon" href="images/MSU-logo/default.png" />
     <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Nunito:ital,wght@0,200..1000;1,200..1000&display=swap" rel="stylesheet">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Nunito:ital,wght@0,200..1000;1,200..1000&family=Sour+Gummy:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:ital,wght@0,200..1000;1,200..1000&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:ital,wght@0,200..1000;1,200..1000&family=Sour+Gummy:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+    
+
+    <script>
+      window.onload = function () {
+        // Check if the user has visited before by reading from localStorage
+        const hasVisited = sessionStorage.getItem('hasVisited');
+    
+        // Run the logic only if the user has not visited before
+        if (!hasVisited) {
+          // Show the welcome message
+          alert("Welcome to MsuBid! Please Log In first to Continue");
+    
+          // Set the flag in localStorage to mark the user as having visited
+          sessionStorage.setItem('hasVisited', 'true');
+    
+          // Redirect the user to the login page
+          window.location.href = '/signin.html';
+        }
+      };
+    </script>
+    
+    
   </head>
   <body>
     <!-- Navigation Bar -->
@@ -38,7 +60,6 @@
         </div>
       </div>
     </header>
-    
 
     <!-- Main Banner with Background Image -->
     <section class="banner">
@@ -53,7 +74,6 @@
       <div class="banner-text">
         <h2>Find Your Dream Car with MsuBid</h2>
         <p>Your trusted marketplace for car auctions</p>
-<!-- Assuming you have a button like this somewhere in index.html -->
         <a href="auction.html" class="cta-button">Start Bidding</a>
       </div>
     </section>
@@ -100,6 +120,7 @@
             Choose from a diverse range of car models, including sedans, SUVs,
             and hybrids.
           </p>
+
         </div>
         <div class="feature-item">
           <img src="images/bid.jpg" alt="BMW X6" />
@@ -117,12 +138,12 @@
         </div>
       </div>
     </section>
-<!-- Fixed Button to Sell Your Car -->
-<div class="sell-button-container">
- 
-  <a href="upload-car.html" class="sell-fixed-button">Sell Your Car</a>
-  
-  </div>
+
+    <!-- Fixed Button to Sell Your Car -->
+    <div class="sell-button-container">
+      <a href="upload-car.html" class="sell-fixed-button">Sell Your Car</a>
+    </div>
+
     <!-- Footer Section -->
     <footer>
       <div class="footer-content">
@@ -148,4 +169,3 @@
     </footer>
   </body>
 </html>
-
