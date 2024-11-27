@@ -286,20 +286,51 @@ app.get('/api/vehicles/:vehicleId', (req, res) => {
 });
 
 
-
-
 app.post("/logout", (req, res) => {
-  req.session.destroy((err))
   req.session.destroy((err) => {
-    if (err) {
-      return res.status(500).json({ error: "Failed to log out." });
-    }
-    res.clearCookie("connect.sid");
-    res.status(200).json({ message: "Logged out successfully." });
+      if (err) {
+          return res.status(500).json({ error: "Failed to log out." });
+      }
+      res.clearCookie("connect.sid"); // Clear the session cookie
+      res.status(200).json({ message: "Logged out successfully." });
   });
 });
 
+app.get("/api/user", (req, res) => {
+    const userId = req.session.user_id;
 
+    if (!userId) {
+        return res.status(401).json({ error: "Unauthorized. Please log in." });
+    }
+
+    const query = `
+        SELECT 
+            User_Id, 
+            First_Name, 
+            Last_Name, 
+            Email_Address, 
+            Contact_Number, 
+            Profile_Picture, 
+            Items_Sold, 
+            Vehicles_Purchased, 
+            Seller_Rating 
+        FROM Users 
+        WHERE User_Id = ?
+    `;
+
+    db.query(query, [userId], (err, result) => {
+        if (err) {
+            console.error("Database error:", err);
+            return res.status(500).json({ error: "Failed to fetch user data" });
+        }
+
+        if (result.length === 0) {
+            return res.status(404).json({ error: "User not found" });
+        }
+
+        res.status(200).json(result[0]);
+    });
+});
 
 const PORT = process.env.PORT || 8000;
 app.listen(PORT, () => {
