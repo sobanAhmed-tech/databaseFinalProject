@@ -247,18 +247,36 @@ app.post("/add-car", (req, res) => {
   });
 });
 
+
 app.get("/api/vehicles", (req, res) => {
-  const query = "SELECT * FROM Vehicles";
+  const userId = req.session.user_id;
+  const query = "SELECT * FROM Vehicles WHERE User_Id != ?"; // Use a parameterized query
 
-  db.query(query, (err, results) => {
-    if (err) {
-      console.error("Error fetching vehicles:", err);
-      return res.status(500).json({ error: "Failed to fetch vehicles." });
-    }
+  db.query(query, [userId], (err, results) => {
+      if (err) {
+          console.error("Error fetching vehicles:", err);
+          return res.status(500).json({ error: "Failed to fetch vehicles." });
+      }
 
-    res.status(200).json(results);
+      res.status(200).json(results);
   });
 });
+
+app.get("/user-cars", (req, res) => {
+  const userId = req.session.user_id;
+  const query = "SELECT * FROM Vehicles WHERE User_Id = ?"; // Use a parameterized query
+
+  db.query(query, [userId], (err, results) => {
+      if (err) {
+          console.error("Error fetching vehicles:", err);
+          return res.status(500).json({ error: "Failed to fetch vehicles." });
+      }
+
+      res.status(200).json(results);
+  });
+});
+
+
 
 
 app.get('/api/vehicles/:vehicleId', (req, res) => {
