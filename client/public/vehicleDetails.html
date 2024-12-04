@@ -33,33 +33,7 @@
 
     <!-- Main Content -->
     <main class="details-container">
-        <!-- Car Images -->
-        <section class="car-image-gallery">
-            <div class="main-image">
-                <img src="" alt="Car Image" id="mainImage">
-            </div>
-        </section>
-
-        <section class="car-overview">
-            <div class="overview-item">
-                <img class="logo-1" src="../images/date_range_30dp_666666_FILL1_wght400_GRAD0_opsz24.svg" alt="Model Year Icon">
-                <p id="modelYear">2020</p>
-            </div>
-            <div class="overview-item">
-                <img src="../images/speed_30dp_666666_FILL1_wght400_GRAD0_opsz24.svg" alt="Mileage Icon">
-                <p id="mileage">88,500 km</p>
-            </div>
-            <div class="overview-item">
-                <img src="../images/local_gas_station_30dp_666666_FILL1_wght400_GRAD0_opsz24.svg" alt="Fuel Icon">
-                <p id="fuelType">Petrol</p>
-            </div>
-            <div class="overview-item">
-                <img src="../images/auto_transmission_30dp_666666_FILL1_wght400_GRAD0_opsz24.svg" alt="Transmission Icon">
-                <p id="transmission">Automatic</p>
-            </div>
-        </section>
-
-        <!-- Car Details -->
+        <!-- Car Details Section -->
         <section class="car-details">
             <h2 id="vehicleName">Kia Sportage</h2>
             <p><strong>Company:</strong> <span id="company">Kia</span></p>
@@ -72,64 +46,111 @@
             <p><strong>Number of Doors:</strong> <span id="numDoors">4</span></p>
             <p><strong>Seats:</strong> <span id="seats">5</span></p>
             <p><strong>Transmission:</strong> <span id="transmissionType">Automatic</span></p>
+            <p><strong>Maximum Bids:</strong> <span id="MaxBid">Null</span></p>
+            <p id="demo"></p>
+            <p id="demo2"></p>
+            <label for="PlaceBid">PlaceBid:</label>
+      <input type="number" id="PlaceBid" name="PlaceBid" required>
+      <button id="placeBidButton">Place Bid</button>
+
         </section>
 
-        <!-- Features -->
-        <section class="car-features">
-            <h2>Features</h2>
-            <ul id="carFeatures">
-                <!-- List of features will be dynamically filled -->
-            </ul>
+                <!-- Centered Transportation Button -->
+        <div class="navbar-buttons">
+            <a href="Transportation.html" class="nav-btn transportation">Transportation</a>
+        </div>
+        <!-- Conversation Section -->
+        <section class="conversation-section">
+            <h2>Questions and Answers</h2>
+
+            <!-- Questions List -->
+            <div id="questionsList">
+                <!-- Questions will be dynamically added here -->
+            </div>
+
+            <!-- Ask a Question Form -->
+            <div class="ask-question-form">
+                <textarea id="questionInput" placeholder="Ask a question about this vehicle..." rows="3"></textarea>
+                <button id="submitQuestion">Submit</button>
+            </div>
         </section>
     </main>
 
     <!-- Footer -->
     <footer class="custom-footer">
         <div class="footer-content">
-            <!-- Car and Price Details -->
-            <div class="footer-left">
-                <h2 id="footerCarName">KIA Sportage AWD 2020</h2>
-                <p id="footerPrice">PKR 6,325,000</p>
-            </div>
-
-            <!-- Action Buttons -->
-            <div class="footer-center">
-                <button class="footer-btn phone-btn">
-                    <i class="fa fa-phone"></i> Contact Seller
-                </button>
-            </div>
-
-            <!-- Seller Information -->
-            <div class="footer-right">
-                <div class="seller-info">
-                    <p><strong>Seller Name:</strong> <span id="sellerName">John Doe</span></p>
-                    <p><strong>Contact:</strong> <span id="sellerContact">03123456789</span></p>
-                    <p><strong>City:</strong> <span id="sellerCity">Lahore</span></p>
-                </div>
-            </div>
+            <h2 id="footerCarName">KIA Sportage AWD 2020</h2>
         </div>
     </footer>
-
     <script>
-        // Function to fetch car details based on vehicleId
+        // Get vehicle ID from the URL
+        const params = new URLSearchParams(window.location.search);
+        const vehicleId = params.get("vehicleId");
+    
+        if (!vehicleId) {
+            alert("Vehicle ID is missing!");
+        }
+        else {
+            sessionStorage.removeItem(vehicleId);
+    // Store the vehicleId in localStorage or sessionStorage
+    sessionStorage.setItem("vehicleId", vehicleId);
+    console.log(vehicleId);
+
+}
+
+document.getElementById("placeBidButton").addEventListener("click", async () => {
+    const placeBidInput = document.getElementById("PlaceBid").value;
+    const vehicleId = sessionStorage.getItem("vehicleId");
+    const userId = sessionStorage.getItem("userId");  // Assuming the userId is stored in sessionStorage
+
+    if (!placeBidInput || !vehicleId) {
+        alert("Missing required information to place a bid.");
+        return;
+    }
+
+    const newBid = parseFloat(placeBidInput);
+
+    try {
+        const response = await fetch("http://localhost:8000/api/placeBid", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+                vehicleId,
+                userId,
+                newBid,
+            }),
+        });
+
+        if (!response.ok) {
+            const errorData = await response.json();
+            alert(`Error: ${errorData.error}`);
+            return;
+        }
+
+        const data = await response.json();
+        alert("Bid placed successfully!");
+
+        // Update the maximum bid and auction times in the UI
+        document.getElementById("MaxBid").textContent = newBid;
+        document.getElementById("demo").textContent = `Start: ${data.updatedDetails.startTime}, End: ${data.updatedDetails.endTime}`;
+    } catch (error) {
+        console.error("Error placing bid:", error);
+        alert("An error occurred while placing the bid.");
+    }
+});
+
+    
+        // Fetch car details
         async function fetchCarDetails() {
-            const params = new URLSearchParams(window.location.search);
-            const vehicleId = params.get("vehicleId");
-
-            if (!vehicleId) {
-                alert("Vehicle ID is missing!");
-                return;
-            }
-            console.log("Vehicle ID:", vehicleId);
-
             try {
                 const response = await fetch(`http://localhost:8000/api/vehicles/${vehicleId}`);
-                if (!response.ok) {
-                    throw new Error("Failed to fetch car details");
-                }
+                if (!response.ok) throw new Error("Failed to fetch car details");
+    
                 const car = await response.json();
-
-                // Update the page with the fetched car data
+                console.log("Fetched vehicle details:", car); // Debugging line
+    
                 document.getElementById("vehicleName").textContent = car.Vehicle_Name;
                 document.getElementById("company").textContent = car.Vehicle_Company;
                 document.getElementById("vehicleType").textContent = car.Vehicle_Type;
@@ -141,22 +162,131 @@
                 document.getElementById("numDoors").textContent = car.NumDoors;
                 document.getElementById("seats").textContent = car.Seats;
                 document.getElementById("transmissionType").textContent = car.Transmission;
-
-                // Footer details (optional)
-                document.getElementById("footerCarName").textContent = car.Vehicle_Name + " " + car.Vehicle_Model;
-
-                // Set car image (assuming the image URL is part of the car data)
-                document.getElementById("mainImage").src = car.Vehicle_Images || "../images/default_car_image.png";
-
             } catch (error) {
-                console.error(error.message);
-                alert("An error occurred while fetching car details!");
+                console.error("Error fetching vehicle details:", error);
             }
         }
+    
+        // Fetch questions for this vehicle
+        async function fetchQuestions() {
+            try {
+                const response = await fetch(`http://localhost:8000/api/questions/${vehicleId}`);
+                if (!response.ok) throw new Error("Failed to fetch questions");
+    
+                const questions = await response.json();
+                const questionsList = document.getElementById("questionsList");
+    
+                questionsList.innerHTML = ""; // Clear existing questions
+                questions.forEach((question) => {
+                    const questionElement = document.createElement("div");
+                    questionElement.className = "question";
+    
+                    questionElement.innerHTML = `
+                        <p><strong>${question.Buyer_FirstName} ${question.Buyer_LastName}:</strong> ${question.Inquiry_Content}</p>
+                        ${question.Question_Answered ? `<p><em>Answer: ${question.Answer_Content}</em></p>` : ""}
+                    `;
+    
+                    questionsList.appendChild(questionElement);
+                });
+            } catch (error) {
+                console.error(error);
+            }
+        }
+    
+        // Fetch maximum bid for this vehicle
+        async function fetchMaximumBid() {
+            try {
+                const response = await fetch(`http://localhost:8000/api/maximumBid/${vehicleId}`);
+                if (!response.ok) throw new Error("Failed to fetch maximum bid");
+    
+                const data = await response.json();
+                console.log("Fetched maximum bid:", data); // Debugging line
+    
+                // Display the maximum bid
+                document.getElementById("MaxBid").textContent = data.maximumBid;
+            } catch (error) {
+                console.error("Error fetching maximum bid:", error);
+            }
+        }
+    
+        // Submit a new question
+        async function submitQuestion() {
+            const questionInput = document.getElementById("questionInput");
+            const questionContent = questionInput.value.trim();
+    
+            if (!questionContent) {
+                alert("Please enter a question.");
+                return;
+            }
+    
+            try {
+                const response = await fetch("http://localhost:8000/api/questions", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify({
+                        vehicleId: vehicleId,
+                        inquiryContent: questionContent,
+                    }),
+                });
+    
+                if (!response.ok) throw new Error("Failed to submit question");
+    
+                questionInput.value = ""; // Clear the input field
+                fetchQuestions(); // Refresh the questions list
+            } catch (error) {
+                console.error(error);
+            }
+        }
+        
+        async function fetchAuctionDetails() {
+    try {
+        const response = await fetch(`http://localhost:8000/api/GetTime/${vehicleId}`);
+        if (!response.ok) throw new Error("Failed to fetch auction details");
 
-        // Fetch car details on page load
-        document.addEventListener("DOMContentLoaded", fetchCarDetails);
+        const data = await response.json();
+        const countDownDate = new Date(data.Ending_Time).getTime();
+
+        const timerInterval = setInterval(() => {
+            const now = new Date().getTime();
+            const distance = countDownDate - now;
+
+            const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+            const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+            const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+            document.getElementById("demo").innerHTML =
+                `${days}d ${hours}h ${minutes}m ${seconds}s`;
+
+            if (distance < 0) {
+                clearInterval(timerInterval);
+                document.getElementById("demo").innerHTML = "Auction Has Been Closed";
+            }
+            if (distance > 0) {
+                
+                document.getElementById("demo2").innerHTML = "Auction Is Open for now";
+            }
+        }, 1000);
+    } catch (error) {
+        console.error("Error fetching auction details:", error);
+    }
+}
+
+        // Event listeners
+        document.addEventListener("DOMContentLoaded", () => {
+            fetchCarDetails();
+            fetchQuestions();
+            fetchMaximumBid(); // Make sure to call this to fetch and display the maximum bid
+            fetchAuctionDetails();
+            document.getElementById("submitQuestion").addEventListener("click", submitQuestion);
+        });
+
+        
+
     </script>
+    
 </body>
 
 </html>

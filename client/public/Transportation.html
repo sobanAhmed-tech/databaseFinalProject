@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Transportation</title>
+    <link rel="stylesheet" href="transportation.css">
+</head>
+
+<body>
+    <header class="navbar">
+        <div class="navbar-content">
+            <div class="navbar-logo">
+                <img src="../images/MSU-logo/default.png" alt="MSU Logo" class="logo">
+            </div>
+            <div class="navbar-title">
+                <h1>Transportation</h1>
+            </div>
+            <div class="navbar-buttons">
+                <a href="user_profile.html"><button class="nav-btn">My Profile</button></a>
+                <a href="index.html"><button class="nav-btn">Home</button></a>
+            </div>
+        </div>
+    </header>
+    <main class="transportation-form-container">
+        <section class="form-section">
+            <h2>Enter Transportation Details</h2>
+            <p>Please provide the required information to arrange transportation.</p>
+            <form id="transportation-form" class="transportation-form">
+                <input type="hidden" id="auction-id" name="auction_id" value="" /> <!-- Hidden field for Auction_Id -->
+            
+                <label for="shipping-method">Shipping Method:</label>
+                <select id="shipping-method" name="shipping_method" required>
+                    <option value="standard">Standard</option>
+                    <option value="express">Express</option>
+                    <option value="self-pickup">Self Pickup</option>
+                </select>
+            
+                <label for="buyer-address">Buyer Address:</label>
+                <input type="text" id="buyer-address" name="buyer_address" placeholder="Enter buyer's address" required>
+            
+                <label for="arrival-date">Arrival Date:</label>
+                <input type="date" id="arrival-date" name="arrival_date" required>
+            
+                <button type="submit" class="submit-btn">Submit Transportation Details</button>
+            </form>
+        </section>
+        <div class="transaction-button-container">
+            <a href="transactions.html">
+                <button class="transaction-btn">Transaction</button>
+            </a>
+        </div>
+    </main>
+    <footer>
+        <p>© 2024 Your Team Name. All rights reserved.</p>
+    </footer>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            // Retrieve vehicleId from sessionStorage
+            const vehicleId = sessionStorage.getItem("vehicleId");
+
+            if (!vehicleId) {
+                alert("Vehicle ID is missing!");
+            } else {
+                console.log("Vehicle ID received:", vehicleId);
+                
+                // Set the vehicleId as the value of the hidden auction-id input field
+                document.getElementById("auction-id").value = vehicleId;
+                console.log("Vehicle ID from sessionStorage: ", vehicleId);
+            }
+
+            // Attach event listener to the form
+            document.getElementById("transportation-form").addEventListener("submit", function (e) {
+                e.preventDefault(); // Prevent default form submission
+
+                // Collect form data
+                const shippingMethod = document.getElementById("shipping-method").value;
+                const buyerAddress = document.getElementById("buyer-address").value;
+                const arrivalDate = document.getElementById("arrival-date").value;
+                const auctionId = document.getElementById("auction-id").value; // Now this contains the vehicle_id as auction_id
+
+                // Validate form inputs
+                if (!shippingMethod || !buyerAddress || !arrivalDate) {
+                    alert("Please fill in all fields.");
+                    return;
+                }
+
+                // Send data to the server (assuming you're using fetch)
+                fetch('http://localhost:8000/submit-transportation', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        vehicle_id: auctionId,
+                        shipping_method: shippingMethod,
+                        buyer_address: buyerAddress,
+                        arrival_date: arrivalDate
+                    })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    console.log(data.message); // Show the success message or handle errors
+                    alert(data.message); // Optionally show an alert with the message
+                })
+                .catch(error => {
+                    console.error('Error:', error); // Handle any errors that occur during the fetch
+                    alert('An error occurred. Please try again.');
+                });
+            });
+        });
+    </script>
+    
+</body>
+</html>
