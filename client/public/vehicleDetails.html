@@ -25,7 +25,9 @@
 
             <!-- Login and Signup Buttons -->
             <div class="navbar-buttons">
-                <button class="nav-btn login">Login</button>
+                <button onclick="window.location.href='index.html'" class="nav-btn login">Home Page</button>
+
+
                 <button class="nav-btn signup">Sign Up</button>
             </div>
         </div>
@@ -83,65 +85,22 @@
             <h2 id="footerCarName">KIA Sportage AWD 2020</h2>
         </div>
     </footer>
+    
     <script>
-        // Get vehicle ID from the URL
+        // Fetch vehicleId from query parameters or sessionStorage
         const params = new URLSearchParams(window.location.search);
-        const vehicleId = params.get("vehicleId");
+        let vehicleId = params.get("vehicleId");
     
         if (!vehicleId) {
-            alert("Vehicle ID is missing!");
+            vehicleId = sessionStorage.getItem("vehicleId");
+            if (!vehicleId) {
+                alert("Vehicle ID is missing!");
+            }
+        } else {
+            sessionStorage.setItem("vehicleId", vehicleId); // Store in sessionStorage for future use
         }
-        else {
-            sessionStorage.removeItem(vehicleId);
-    // Store the vehicleId in localStorage or sessionStorage
-    sessionStorage.setItem("vehicleId", vehicleId);
-    console.log(vehicleId);
-
-}
-
-document.getElementById("placeBidButton").addEventListener("click", async () => {
-    const placeBidInput = document.getElementById("PlaceBid").value;
-    const vehicleId = sessionStorage.getItem("vehicleId");
-    const userId = sessionStorage.getItem("userId");  // Assuming the userId is stored in sessionStorage
-
-    if (!placeBidInput || !vehicleId) {
-        alert("Missing required information to place a bid.");
-        return;
-    }
-
-    const newBid = parseFloat(placeBidInput);
-
-    try {
-        const response = await fetch("http://localhost:8000/api/placeBid", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-                vehicleId,
-                userId,
-                newBid,
-            }),
-        });
-
-        if (!response.ok) {
-            const errorData = await response.json();
-            alert(`Error: ${errorData.error}`);
-            return;
-        }
-
-        const data = await response.json();
-        alert("Bid placed successfully!");
-
-        // Update the maximum bid and auction times in the UI
-        document.getElementById("MaxBid").textContent = newBid;
-        document.getElementById("demo").textContent = `Start: ${data.updatedDetails.startTime}, End: ${data.updatedDetails.endTime}`;
-    } catch (error) {
-        console.error("Error placing bid:", error);
-        alert("An error occurred while placing the bid.");
-    }
-});
-
+    
+        console.log(vehicleId);
     
         // Fetch car details
         async function fetchCarDetails() {
@@ -150,7 +109,7 @@ document.getElementById("placeBidButton").addEventListener("click", async () => 
                 if (!response.ok) throw new Error("Failed to fetch car details");
     
                 const car = await response.json();
-                console.log("Fetched vehicle details:", car); // Debugging line
+                console.log("Fetched vehicle details:", car);
     
                 document.getElementById("vehicleName").textContent = car.Vehicle_Name;
                 document.getElementById("company").textContent = car.Vehicle_Company;
@@ -176,8 +135,8 @@ document.getElementById("placeBidButton").addEventListener("click", async () => 
     
                 const questions = await response.json();
                 const questionsList = document.getElementById("questionsList");
-    
                 questionsList.innerHTML = ""; // Clear existing questions
+    
                 questions.forEach((question) => {
                     const questionElement = document.createElement("div");
                     questionElement.className = "question";
@@ -201,9 +160,8 @@ document.getElementById("placeBidButton").addEventListener("click", async () => 
                 if (!response.ok) throw new Error("Failed to fetch maximum bid");
     
                 const data = await response.json();
-                console.log("Fetched maximum bid:", data); // Debugging line
+                console.log("Fetched maximum bid:", data);
     
-                // Display the maximum bid
                 document.getElementById("MaxBid").textContent = data.maximumBid;
             } catch (error) {
                 console.error("Error fetching maximum bid:", error);
@@ -227,7 +185,7 @@ document.getElementById("placeBidButton").addEventListener("click", async () => 
                         "Content-Type": "application/json",
                     },
                     body: JSON.stringify({
-                        vehicleId: vehicleId,
+                        vehicleId,
                         inquiryContent: questionContent,
                     }),
                 });
@@ -240,52 +198,103 @@ document.getElementById("placeBidButton").addEventListener("click", async () => 
                 console.error(error);
             }
         }
-        
+    
+        // Fetch auction details and set countdown timer
         async function fetchAuctionDetails() {
-    try {
-        const response = await fetch(`http://localhost:8000/api/GetTime/${vehicleId}`);
-        if (!response.ok) throw new Error("Failed to fetch auction details");
-
-        const data = await response.json();
-        const countDownDate = new Date(data.Ending_Time).getTime();
-
-        const timerInterval = setInterval(() => {
-            const now = new Date().getTime();
-            const distance = countDownDate - now;
-
-            const days = Math.floor(distance / (1000 * 60 * 60 * 24));
-            const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-            const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
-            const seconds = Math.floor((distance % (1000 * 60)) / 1000);
-
-            document.getElementById("demo").innerHTML =
-                `${days}d ${hours}h ${minutes}m ${seconds}s`;
-
-            if (distance < 0) {
-                clearInterval(timerInterval);
-                document.getElementById("demo").innerHTML = "Auction Has Been Closed";
+            try {
+                const response = await fetch(`http://localhost:8000/api/GetTime/${vehicleId}`);
+                if (!response.ok) throw new Error("Failed to fetch auction details");
+    
+                const data = await response.json();
+                const countDownDate = new Date(data.Ending_Time).getTime();
+    
+                const updateTimer = () => {
+                    const now = new Date().getTime();
+                    const distance = countDownDate - now;
+    
+                    if (distance < 0) {
+                        clearInterval(timerInterval);
+                        document.getElementById("demo").innerHTML = "Auction Has Been Closed";
+                        return;
+                    }
+    
+                    const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+                    const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                    const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+                    const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+    
+                    document.getElementById("demo").innerHTML =
+                        `${days}d ${hours}h ${minutes}m ${seconds}s`;
+                    document.getElementById("demo2").innerHTML = "Auction Is Open for now";
+                };
+    
+                updateTimer(); // Call immediately
+                const timerInterval = setInterval(updateTimer, 1000);
+            } catch (error) {
+                console.error("Error fetching auction details:", error);
             }
-            if (distance > 0) {
-                
-                document.getElementById("demo2").innerHTML = "Auction Is Open for now";
+        }
+    
+        // Place a bid
+        document.getElementById("placeBidButton").addEventListener("click", async () => {
+            const placeBidInput = document.getElementById("PlaceBid").value;
+            const userId = sessionStorage.getItem("userId"); // Assuming the userId is stored in sessionStorage
+    
+            if (!placeBidInput || !vehicleId) {
+                alert("Missing required information to place a bid.");
+                return;
             }
-        }, 1000);
-    } catch (error) {
-        console.error("Error fetching auction details:", error);
-    }
-}
-
-        // Event listeners
+    
+            const newBid = parseFloat(placeBidInput);
+    
+            try {
+                const response = await fetch("http://localhost:8000/api/placeBid", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify({
+                        vehicleId,
+                        userId,
+                        newBid,
+                    }),
+                });
+    
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    alert(`Error: ${errorData.error || "Failed to place bid."}`);
+                    return;
+                }
+    
+                const data = await response.json();
+                alert("Bid placed successfully!");
+    
+                // Update the maximum bid and auction times in the UI
+                document.getElementById("MaxBid").textContent = newBid;
+                if (data.updatedDetails) {
+                    document.getElementById("demo").textContent = 
+                        `Start: ${data.updatedDetails.startTime}, End: ${data.updatedDetails.endTime}`;
+                }
+    
+                // Update the URL while preserving vehicleId
+                params.set("PlacedBid", newBid);
+                const newUrl = `${window.location.pathname}?${params.toString()}`;
+                window.location.href = newUrl; // Redirect to updated URL
+            } catch (error) {
+                console.error("Error placing bid:", error);
+                alert("An error occurred while placing the bid.");
+            }
+        });
+    
+        // Initialize the page
         document.addEventListener("DOMContentLoaded", () => {
             fetchCarDetails();
             fetchQuestions();
-            fetchMaximumBid(); // Make sure to call this to fetch and display the maximum bid
+            fetchMaximumBid();
             fetchAuctionDetails();
+    
             document.getElementById("submitQuestion").addEventListener("click", submitQuestion);
         });
-
-        
-
     </script>
     
 </body>

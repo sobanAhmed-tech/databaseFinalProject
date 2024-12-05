@@ -152,19 +152,26 @@
     
         // Fetch maximum bid for this vehicle
         async function fetchMaximumBid() {
-            try {
-                const response = await fetch(`http://localhost:8000/api/maximumBid/${vehicleId}`);
-                if (!response.ok) throw new Error("Failed to fetch maximum bid");
+    try {
+        // Clear the maximum bid display before fetching new data
+        document.getElementById("MaxBid").textContent = ""; 
+
+        const response = await fetch(`http://localhost:8000/api/maximumBid/${vehicleId}`);
+        if (!response.ok) throw new Error("Failed to fetch maximum bid");
+
+        const data = await response.json();
+        console.log("Fetched maximum bid:", data); // Debugging line
+
+        // Display the maximum bid
+        document.getElementById("MaxBid").textContent = data.maximumBid;
+
+        // Optionally, store the maximum bid for future usage
+        sessionStorage.setItem("maximumBid", data.maximumBid);
+    } catch (error) {
+        console.error("Error fetching maximum bid:", error);
+    }
+}
     
-                const data = await response.json();
-                console.log("Fetched maximum bid:", data); // Debugging line
-    
-                // Display the maximum bid
-                document.getElementById("MaxBid").textContent = data.maximumBid;
-            } catch (error) {
-                console.error("Error fetching maximum bid:", error);
-            }
-        }
     
         // Submit a new question
         async function submitQuestion() {

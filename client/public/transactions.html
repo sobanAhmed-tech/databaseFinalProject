@@ -28,8 +28,9 @@
             <h2>Complete Your Transaction</h2>
             <p>Please fill in the details below to finalize your transaction.</p>
             <form id="transaction-form" class="transaction-form">
-                <input type="hidden" id="vehicle-id" name="vehicle_id" value="" /> <!-- Hidden field for Vehicle ID -->
-            
+                <!-- Hidden field for Vehicle ID -->
+                <input type="hidden" id="vehicle-id" name="vehicle_id" value="" />
+
                 <label for="transaction-method">Transaction Method:</label>
                 <select id="transaction-method" name="transaction_method" required>
                     <option value="bank check">Bank Check</option>
@@ -37,16 +38,18 @@
                     <option value="bank transfer">Bank Transfer</option>
                     <option value="online payment">Online Payment</option>
                 </select>
-            
+
                 <label for="buyer-account">Buyer Account:</label>
                 <input type="text" id="buyer-account" name="buyer_account" placeholder="Enter buyer account number" required>
-            
-                <label for="shipping-cost">Shipping Cost (PKR):</label>
-                <input type="number" id="shipping-cost" name="shipping_cost" step="0.01" placeholder="Enter shipping cost" required>
-            
-                <label for="transaction-amount">Transaction Amount (PKR):</label>
-                <input type="number" id="transaction-amount" name="transaction_amount" step="0.01" placeholder="Enter transaction amount" required>
-            
+
+                <label for="shipping-cost">Shipping Cost (PKR): 100</label>
+                <br>
+
+                <label id="transaction-amount-label" for="transaction-amount">Transaction Amount (PKR): 
+                    <span id="transaction-amount"></span>
+                </label>
+                <br>
+
                 <button type="submit" class="submit-btn">Submit Transaction</button>
             </form>
         </section>
@@ -63,17 +66,29 @@
 
     <script>
         document.addEventListener("DOMContentLoaded", function () {
-            // Retrieve vehicleId from sessionStorage
+            // Retrieve vehicleId and maximumBid from sessionStorage
             const vehicleId = sessionStorage.getItem('vehicleId');
+            const maximumBid = sessionStorage.getItem('maximumBid');
+            const shippingCost = 100;
 
+            // Validate vehicleId and maximumBid
             if (!vehicleId) {
                 alert("Vehicle ID not found in session storage. Please try again.");
                 return;
             }
 
-            // Set the vehicle ID in the hidden input field
+            if (!maximumBid || isNaN(parseInt(maximumBid))) {
+                alert("Maximum bid is invalid or not found. Please try again.");
+                return;
+            }
+
+            // Calculate transaction amount and set hidden input values
+            const transactionAmount = parseInt(maximumBid) + shippingCost;
+            document.getElementById("transaction-amount").textContent = transactionAmount;
             document.getElementById("vehicle-id").value = vehicleId;
-            console.log("Vehicle ID fetched from sessionStorage:", vehicleId);
+
+            console.log("Vehicle ID fetched:", vehicleId);
+            console.log("Transaction Amount calculated:", transactionAmount);
 
             // Handle form submission
             document.getElementById("transaction-form").addEventListener("submit", function (e) {
@@ -82,10 +97,8 @@
                 // Collect form inputs
                 const transactionMethod = document.getElementById("transaction-method").value;
                 const buyerAccount = document.getElementById("buyer-account").value;
-                const shippingCost = parseFloat(document.getElementById("shipping-cost").value);
-                const transactionAmount = parseFloat(document.getElementById("transaction-amount").value);
 
-                if (!vehicleId || !transactionMethod || !buyerAccount || isNaN(shippingCost) || isNaN(transactionAmount)) {
+                if (!transactionMethod || !buyerAccount) {
                     alert("Please fill in all required fields with valid data.");
                     return;
                 }
@@ -98,6 +111,7 @@
                     transaction_amount: transactionAmount
                 });
 
+                // Submit transaction data
                 fetch('http://localhost:8000/submit-transactions', {
                     method: 'POST',
                     headers: {
@@ -113,14 +127,14 @@
                 })
                 .then(response => {
                     if (!response.ok) {
-                        throw new Error(`HTTP error! status: ${response.status}`);
+                        throw new Error(`HTTP error! Status: ${response.status}`);
                     }
                     return response.json();
                 })
                 .then(data => {
                     alert(data.message);
-                    window.location.href = "/index.html";
                     console.log("Transaction submission response:", data);
+                    window.location.href = "/index.html";
                 })
                 .catch(error => {
                     console.error("Error submitting transaction:", error);
