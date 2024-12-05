@@ -124,7 +124,10 @@
 
         const data = await response.json();
         if (!response.ok) throw new Error(data.error || "An error occurred");
-        
+        if(response.ok)
+        {
+          window.location.href = "/index.html";
+        }
         // Show success alert
         alert(data.message || "Car details updated successfully!");
       } catch (error) {

@@ -478,7 +478,7 @@
   });
 
 
-  app.post("/submit-transportation", (req, res) => {
+app.post("/submit-transportation", (req, res) => {
     const { vehicle_id, shipping_method, buyer_address, arrival_date } = req.body;
 
     if (!vehicle_id || !shipping_method || !buyer_address || !arrival_date) {
@@ -551,9 +551,7 @@
     });
   });
 
-
-
-  app.post("/api/placeBid", (req, res) => {
+app.post("/api/placeBid", (req, res) => {
     const { vehicleId, newBid } = req.body;
     const userId = req.session.user_id;
 
@@ -561,29 +559,38 @@
         return res.status(400).json({ error: "Missing required fields." });
     }
 
-    // Query to get the current maximum bid and auction times
-    const fetchQuery = `
-        SELECT max(Winning_Bid), Starting_Time, Ending_Time 
-        FROM Auctions 
-        WHERE Vehicle_Id = ?
-    `;
+      // Query to get the current maximum bid and auction times
+      const fetchQuery = `
+          SELECT Winning_Bid, Starting_Time, Ending_Time 
+          FROM Auctions 
+          WHERE Vehicle_Id = ?
+      `;
 
-    db.query(fetchQuery, [vehicleId], (err, results) => {
-        if (err) {
-            console.error("Error fetching auction details:", err);
-            return res.status(500).json({ error: "Failed to fetch auction details." });
-        }
+      db.query(fetchQuery, [vehicleId], (err, results) => {
+          if (err) {
+              console.error("Error fetching auction details:", err);
+              return res.status(500).json({ error: "Failed to fetch auction details." });
+          }
 
-        if (results.length === 0) {
-            return res.status(404).json({ error: "Auction not found." });
-        }
+          if (results.length === 0) {
+              return res.status(404).json({ error: "Auction not found." });
+          }
 
-        const { Winning_Bid, Starting_Time, Ending_Time } = results[0];
+          const { Winning_Bid, Starting_Time, Ending_Time } = results[0];
 
-        // Check if the new bid is greater than the current maximum bid
-        if (newBid <= Winning_Bid) {
-            return res.status(400).json({ error: "Bid must be higher than the current maximum bid." });
-        }
+          const currentTime = new Date(); // Get the current time
+
+      if (newBid <= Winning_Bid || currentTime < Starting_Time || currentTime > Ending_Time) {
+      return res.status(400).json({
+          error: "Bid must be higher than the current maximum bid, or the auction is closed."
+      });
+    
+
+
+
+
+}
+
 
         // Update the auction with the new maximum bid
         const auctionQuery = `
@@ -610,4 +617,122 @@
             });
         });
     });
+});
+
+
+
+app.get("/Purchased-cars", (req, res) => {
+  if (!req.session || !req.session.user_id) {
+    return res.status(401).json({ error: "Unauthorized access" });
+  }
+
+  const userId = req.session.user_id;
+
+  const query = `
+    SELECT * 
+    FROM Vehicles 
+    WHERE Vehicle_id IN (
+        SELECT Vehicle_id 
+        FROM Auctions 
+        WHERE User_Id = ? 
+        AND Winning_Bid = (
+            SELECT MAX(Winning_Bid) 
+            FROM Auctions AS subA 
+            WHERE subA.Vehicle_Id = Auctions.Vehicle_Id
+        )
+        AND Ending_Time <= NOW()  -- Check if the auction has ended
+    )
+  `;
+
+  db.query(query, [userId], (err, results) => {
+    if (err) {
+      console.error("Error fetching vehicles:", err);
+      return res.status(500).json({ error: "Failed to fetch vehicles." });
+    }
+
+    res.status(200).json(results);
+  });
+});
+
+
+app.get("/Sold-cars", (req, res) => {
+  const userId = req.session.user_id;
+
+  const query = `
+    SELECT V.*
+    FROM Vehicles V
+    JOIN Auctions A ON V.Vehicle_Id = A.Vehicle_Id
+    WHERE V.Vehicle_Id IN (
+        SELECT Vehicle_Id
+        FROM Vehicles
+        WHERE User_Id = ?
+    ) -- Select only vehicles owned by the current user
+      AND A.User_Id != ? -- Ensure the buyer is not the seller
+      AND A.Ending_Time <= NOW() -- Auction has ended
+      AND A.Winning_Bid = (
+          SELECT MAX(subA.Winning_Bid)
+          FROM Auctions subA
+          WHERE subA.Vehicle_Id = A.Vehicle_Id
+      ) -- Winning bid is the maximum bid
+    GROUP BY V.Vehicle_Id;
+  `;
+
+  db.query(query, [userId, userId], (err, results) => {
+    if (err) {
+      console.error("Error fetching sold cars:", err);
+      return res.status(500).json({ error: "Failed to fetch sold cars." });
+    }
+
+    res.status(200).json(results);
+  });
+});
+
+
+app.post("/submit-transactions", (req, res) => {
+  const { vehicle_id, transaction_method, buyer_account, shipping_cost, transaction_amount } = req.body;
+  const userId = req.session.user_id;
+  // Validate that all required fields are present and valid
+  if (!vehicle_id || !transaction_method || !buyer_account || !shipping_cost || !transaction_amount) {
+      return res.status(400).json({ error: "All fields are required." });
+  }
+  
+  // SQL query to fetch Auction_Id based on Vehicle_Id
+  const getAuctionQuery = `
+      SELECT Auction_Id 
+      FROM Auctions 
+      WHERE Vehicle_Id = ? 
+      ORDER BY Winning_Bid DESC LIMIT 1;
+  `;
+
+  db.query(getAuctionQuery, [vehicle_id], (err, result) => {
+      if (err) {
+          console.error("Database query error while fetching auction:", err);
+          return res.status(500).json({ error: "Failed to fetch auction." });
+      }
+
+      console.log("Auction query result:", result);
+
+      if (result.length === 0) {
+          console.log("No auction found for the given vehicle.");
+          return res.status(404).json({ error: "No auction found for the given vehicle." });
+      }
+
+      const auction_id = result[0].Auction_Id;
+
+      // SQL query to insert transaction details
+      const insertQuery = `
+          INSERT INTO Transactions (Buyer_id,Auction_Id, Transaction_Method, Buyer_Account, Shipping_Cost, Transaction_Amount) 
+          VALUES (?, ?, ?, ?, ?,?)
+      `;
+      const values = [userId,auction_id, transaction_method, buyer_account, shipping_cost, transaction_amount];
+
+      db.query(insertQuery, values, (insertErr) => {
+          if (insertErr) {
+              console.error("Database error while inserting transaction:", insertErr);
+              return res.status(500).json({ error: "Failed to submit transaction details." });
+          }
+
+          res.status(201).json({ message: "Transaction details submitted successfully!" });
+      });
+  });
 });

@@ -49,12 +49,8 @@
             <p><strong>Maximum Bids:</strong> <span id="MaxBid">Null</span></p>
             <p id="demo"></p>
             <p id="demo2"></p>
+            <br>
             
-            <form>
-                <label for="PlaceBid">Place your bid:</label>
-                <input type="number" id="PlaceBid" name="PlaceBid" step="0.01" required placeholder="Enter bid amount">
-                <button type="submit" id="placeBidButton">Place Bid</button>
-            </form>
             
         </section>
 
@@ -99,48 +95,6 @@
 
 }
 
-document.getElementById("placeBidButton").addEventListener("click", async () => {
-    const placeBidInput = document.getElementById("PlaceBid").value;
-    const vehicleId = sessionStorage.getItem("vehicleId");
-    const userId = sessionStorage.getItem("userId");  // Assuming the userId is stored in sessionStorage
-
-    if (!placeBidInput || !vehicleId) {
-        alert("Missing required information to place a bid.");
-        return;
-    }
-
-    const newBid = parseFloat(placeBidInput);
-
-    try {
-        const response = await fetch("http://localhost:8000/api/placeBid", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-                vehicleId,
-                userId,
-                newBid,
-            }),
-        });
-
-        if (!response.ok) {
-            const errorData = await response.json();
-            alert(`Error: ${errorData.error}`);
-            return;
-        }
-
-        const data = await response.json();
-        alert("Bid placed successfully!");
-
-        // Update the maximum bid and auction times in the UI
-        document.getElementById("MaxBid").textContent = newBid;
-        document.getElementById("demo").textContent = `Start: ${data.updatedDetails.startTime}, End: ${data.updatedDetails.endTime}`;
-    } catch (error) {
-        console.error("Error placing bid:", error);
-        alert("An error occurred while placing the bid.");
-    }
-});
 
     
         // Fetch car details
@@ -263,7 +217,7 @@ document.getElementById("placeBidButton").addEventListener("click", async () => 
 
             if (distance < 0) {
                 clearInterval(timerInterval);
-                document.getElementById("demo").innerHTML = "Auction Has Been Closed";
+                document.getElementById("demo").innerHTML = "Your Car Has Been Sold";
             }
             if (distance > 0) {
                 

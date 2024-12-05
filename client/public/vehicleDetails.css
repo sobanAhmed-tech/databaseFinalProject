@@ -462,3 +462,77 @@ background-color: #003d99;
     font-size: 0.9rem;
 }
 }
+
+/* Styling for the timer (demo) */
+#demo {
+  font-size: 24px;
+  font-weight: bold;
+  color: #e74c3c; /* Red color for countdown */
+  text-align: center;
+  margin-top: 20px;
+}
+
+/* Styling for the auction status (demo2) */
+#demo2 {
+  font-size: 20px;
+  font-weight: bold;
+  color: #2ecc71; /* Green color for open auction status */
+  text-align: center;
+  margin-top: 10px;
+}
+
+/* Label for PlaceBid */
+label[for="PlaceBid"] {
+  font-size: 18px;
+  font-weight: bold;
+  color: #333;
+  display: block;
+  margin-top: 20px;
+}
+
+/* Styling for the input field where user enters the bid */
+#PlaceBid {
+  width: 100%;
+  padding: 10px;
+  font-size: 16px;
+  margin-top: 10px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  background-color: #f9f9f9;
+  color: #333;
+  transition: border-color 0.3s ease;
+}
+
+/* Focus effect for the input field */
+#PlaceBid:focus {
+  border-color: #3498db;
+  outline: none;
+}
+
+/* Styling for the Place Bid button */
+#placeBidButton {
+  width: 100%;
+  padding: 12px;
+  background-color: #3498db;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  font-size: 16px;
+  cursor: pointer;
+  margin-top: 15px;
+  transition: background-color 0.3s ease;
+}
+
+/* Hover effect for the Place Bid button */
+#placeBidButton:hover {
+  background-color: #2980b9;
+}
+
+/* Form container to ensure elements are spaced nicely */
+form {
+  margin-top: 20px;
+  width: 100%;
+  max-width: 400px;
+  margin-left: auto;
+  margin-right: auto;
+}

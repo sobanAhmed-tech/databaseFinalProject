@@ -1,9 +1,9 @@
 :root {
     --primary-color:#f7b733;
     --secondary-color: #0056e8; 
-    --background-light: #f9f9f9;
+    --background-light: rgba(180, 250, 180, 0.637);
     --text-dark: #333;
-    --white: #fff;
+    --white: #23b1f3;
 }
 
 * {
@@ -75,6 +75,72 @@ body {
 .navbar-buttons .nav-btn:hover {
     background-color:#0056e8; 
     color: white;
+}
+
+/* General section styling */
+section {
+    margin: 20px;
+    padding: 20px;
+    border-radius: 8px;
+    background: linear-gradient(135deg, #ffffff, #f2f2f2);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    text-align: center;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+/* Styling for section headers */
+section h1 {
+    font-size: 24px;
+    margin: 0;
+}
+
+section a {
+    text-decoration: none;
+    color: #333;
+    font-weight: bold;
+    transition: color 0.3s ease, border-bottom 0.3s ease;
+    position: relative;
+}
+
+/* Add underline on hover */
+section a::after {
+    content: '';
+    position: absolute;
+    bottom: -2px;
+    left: 0;
+    width: 100%;
+    height: 2px;
+    background-color: #007bff;
+    transform: scaleX(0);
+    transform-origin: right;
+    transition: transform 0.3s ease;
+}
+
+section a:hover::after {
+    transform: scaleX(1);
+    transform-origin: left;
+}
+
+/* Hover effects for sections */
+section:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 8px 12px rgba(0, 0, 0, 0.2);
+}
+
+section a:hover {
+    color: #007bff;
+}
+
+/* Media query for responsiveness */
+@media (max-width: 768px) {
+    section {
+        margin: 10px;
+        padding: 15px;
+    }
+
+    section h1 {
+        font-size: 20px;
+    }
 }
 
 .profile-container {

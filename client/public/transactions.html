@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Transaction</title>
+    <link rel="stylesheet" href="transactions.css">
+</head>
+
+<body>
+    <header class="navbar">
+        <div class="navbar-content">
+            <div class="navbar-logo">
+                <img src="../images/MSU-logo/default.png" alt="MSU Logo" class="logo">
+            </div>
+            <div class="navbar-title">
+                <h1>Transactions</h1>
+            </div>
+            <div class="navbar-buttons">
+                <a href="user_profile.html"><button class="nav-btn">My Profile</button></a>
+                <a href="index.html"><button class="nav-btn">Home</button></a>
+            </div>
+        </div>
+    </header>
+
+    <main class="transaction-form-container">
+        <section class="form-section">
+            <h2>Complete Your Transaction</h2>
+            <p>Please fill in the details below to finalize your transaction.</p>
+            <form id="transaction-form" class="transaction-form">
+                <input type="hidden" id="vehicle-id" name="vehicle_id" value="" /> <!-- Hidden field for Vehicle ID -->
+            
+                <label for="transaction-method">Transaction Method:</label>
+                <select id="transaction-method" name="transaction_method" required>
+                    <option value="bank check">Bank Check</option>
+                    <option value="cash">Cash</option>
+                    <option value="bank transfer">Bank Transfer</option>
+                    <option value="online payment">Online Payment</option>
+                </select>
+            
+                <label for="buyer-account">Buyer Account:</label>
+                <input type="text" id="buyer-account" name="buyer_account" placeholder="Enter buyer account number" required>
+            
+                <label for="shipping-cost">Shipping Cost (PKR):</label>
+                <input type="number" id="shipping-cost" name="shipping_cost" step="0.01" placeholder="Enter shipping cost" required>
+            
+                <label for="transaction-amount">Transaction Amount (PKR):</label>
+                <input type="number" id="transaction-amount" name="transaction_amount" step="0.01" placeholder="Enter transaction amount" required>
+            
+                <button type="submit" class="submit-btn">Submit Transaction</button>
+            </form>
+        </section>
+        <div class="transportation-button-container">
+            <a href="transportation.html">
+                <button class="transaction-btn">Transportation</button>
+            </a>
+        </div>
+    </main>
+
+    <footer>
+        <p>© 2024 Your Team Name. All rights reserved.</p>
+    </footer>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            // Retrieve vehicleId from sessionStorage
+            const vehicleId = sessionStorage.getItem('vehicleId');
+
+            if (!vehicleId) {
+                alert("Vehicle ID not found in session storage. Please try again.");
+                return;
+            }
+
+            // Set the vehicle ID in the hidden input field
+            document.getElementById("vehicle-id").value = vehicleId;
+            console.log("Vehicle ID fetched from sessionStorage:", vehicleId);
+
+            // Handle form submission
+            document.getElementById("transaction-form").addEventListener("submit", function (e) {
+                e.preventDefault();
+
+                // Collect form inputs
+                const transactionMethod = document.getElementById("transaction-method").value;
+                const buyerAccount = document.getElementById("buyer-account").value;
+                const shippingCost = parseFloat(document.getElementById("shipping-cost").value);
+                const transactionAmount = parseFloat(document.getElementById("transaction-amount").value);
+
+                if (!vehicleId || !transactionMethod || !buyerAccount || isNaN(shippingCost) || isNaN(transactionAmount)) {
+                    alert("Please fill in all required fields with valid data.");
+                    return;
+                }
+
+                console.log("Submitting transaction with values:", {
+                    vehicle_id: vehicleId,
+                    transaction_method: transactionMethod,
+                    buyer_account: buyerAccount,
+                    shipping_cost: shippingCost,
+                    transaction_amount: transactionAmount
+                });
+
+                fetch('http://localhost:8000/submit-transactions', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        vehicle_id: vehicleId,
+                        transaction_method: transactionMethod,
+                        buyer_account: buyerAccount,
+                        shipping_cost: shippingCost,
+                        transaction_amount: transactionAmount
+                    })
+                })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    alert(data.message);
+                    window.location.href = "/index.html";
+                    console.log("Transaction submission response:", data);
+                })
+                .catch(error => {
+                    console.error("Error submitting transaction:", error);
+                    alert("An error occurred while submitting the transaction. Check console for details.");
+                });
+            });
+        });
+    </script>
+</body>
+</html>

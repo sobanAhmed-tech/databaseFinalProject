@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Available Cars</title>
+  <link rel="stylesheet" href="auctions.css"> <!-- Include auction.css for styling -->
+</head>
+<body>
+  <h1>Purchased Cars</h1>
+  <div class="cars-container" id="cars-container"></div>
+
+  
+  <script>
+    // Function to fetch and display cars
+    async function fetchCars() {
+      try {
+        const response = await fetch("http://localhost:8000/Purchased-cars"); // Backend endpoint
+        if (!response.ok) {
+          throw new Error("Failed to fetch cars");
+        }
+        const cars = await response.json();
+  
+        // Select the container where cars will be displayed
+        const carsContainer = document.getElementById("cars-container");
+        carsContainer.innerHTML = ""; // Clear previous content
+  
+        if (cars.length === 0) {
+          carsContainer.innerHTML = "<p>No purchased cars found.</p>";
+          return;
+        }
+  
+        // Iterate over each car and create a box
+        cars.forEach((car) => {
+          const carBox = document.createElement("div");
+          carBox.className = "car-box";
+  
+          // Add car details to the box
+          carBox.innerHTML = `
+            <h3>${car.Vehicle_Name || "Unknown"} (${car.Vehicle_Company || "Unknown"})</h3>
+            <p><span>Type:</span> ${car.Vehicle_Type || "N/A"}</p>
+            <p><span>Model:</span> ${car.Vehicle_Model || "N/A"}</p>
+            <p><span>Mileage:</span> ${car.Vehicle_Mileage || "N/A"}</p>
+            
+            <!-- Link to vehicleDetails.html with car ID -->
+            <a href="PurchasedDetails.html?vehicleId=${car.Vehicle_Id}" class="view-details-btn">View Details</a>
+          `;
+  
+          // Append the car box to the container
+          carsContainer.appendChild(carBox);
+        });
+      } catch (error) {
+        console.error(error.message);
+        const carsContainer = document.getElementById("cars-container");
+        carsContainer.innerHTML = "<p>An error occurred while fetching cars.</p>";
+      }
+    }
+  
+    // Fetch cars when the page loads
+    document.addEventListener("DOMContentLoaded", fetchCars);
+  </script>
+  
+</body>
+</html>
