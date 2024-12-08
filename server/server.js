@@ -192,7 +192,7 @@
 
     // Calculate start and end times for the auction
     const startTime = new Date(); // Current time
-    const endTime = new Date(startTime.getTime() + EndingWaqt * 24 * 60 * 60 * 1000 + 2 * 60 * 1000);
+    const endTime = new Date(startTime.getTime() + EndingWaqt * 24 * 60 * 60 * 1000 + 3 * 60 * 1000);
  
 
     // Insert into the Vehicles table
@@ -264,7 +264,7 @@
         res.status(200).json(results);
     });
   });
-    
+  
   app.get("/user-cars", (req, res) => {
     const userId = req.session.user_id;
     const query = "SELECT * FROM Vehicles WHERE User_Id = ?"; // Use a parameterized query
