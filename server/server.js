@@ -13,15 +13,13 @@
   app.use(cors());
   app.use(express.static(path.join(__dirname, "../client/public")));
 
-  // Configure session middleware
-  // hellioejkrhfjkerhfjkenrjk
   app.use(
     session({
       secret: "your_secret_key",
       resave: false,
       saveUninitialized: false,
       cookie: {
-        secure: false, // Use true if using HTTPS
+        secure: false, 
         maxAge: 1000 * 60 * 60 * 24, // 1 day
       },
     })
@@ -718,8 +716,6 @@ app.post("/submit-transactions", (req, res) => {
       }
 
       const auction_id = result[0].Auction_Id;
-
-      // SQL query to insert transaction details
       const insertQuery = `
           INSERT INTO Transactions (Buyer_id,Auction_Id, Transaction_Method, Buyer_Account, Shipping_Cost, Transaction_Amount) 
           VALUES (?, ?, ?, ?, ?,?)
